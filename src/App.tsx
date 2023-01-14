@@ -1,6 +1,14 @@
+import { wavetable } from 'wavetable';
 import 'styles/style.css';
 
 function App() {
+  const audioCtx = new AudioContext();
+
+  const wave = new PeriodicWave(audioCtx, {
+    real: wavetable.real,
+    imag: wavetable.imag,
+  });
+
   return (
     <div id='sequencer'>
       <section className='controls-main'>
