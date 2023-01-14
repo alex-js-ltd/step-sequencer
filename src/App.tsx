@@ -9,6 +9,17 @@ function App() {
     imag: wavetable.imag,
   });
 
+  function playSweep(time: number) {
+    const osc = new OscillatorNode(audioCtx, {
+      frequency: 380,
+      type: 'custom',
+      periodicWave: wave,
+    });
+    osc.connect(audioCtx.destination);
+    osc.start(time);
+    osc.stop(time + 1);
+  }
+
   return (
     <div id='sequencer'>
       <section className='controls-main'>
