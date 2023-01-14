@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { wavetable } from 'wavetable';
 import 'styles/style.css';
 
@@ -19,6 +20,18 @@ function App() {
     osc.start(time);
     osc.stop(time + 1);
   }
+
+  type State = {
+    attack: string;
+    release: string;
+  };
+
+  const [state, setState] = useState<State>({
+    attack: '0.2',
+    release: '0.5',
+  });
+
+  console.log(state);
 
   return (
     <div id='sequencer'>
@@ -50,8 +63,14 @@ function App() {
               type='range'
               min='0'
               max='1'
-              value='0.2'
+              value={state.attack}
               step='0.1'
+              onChange={(e) =>
+                setState((prev) => ({
+                  ...prev,
+                  attack: e.target.value,
+                }))
+              }
             />
             <label htmlFor='release'>Rel</label>
             <input
@@ -60,8 +79,14 @@ function App() {
               type='range'
               min='0'
               max='1'
-              value='0.5'
+              value={state.release}
               step='0.1'
+              onChange={(e) =>
+                setState((prev) => ({
+                  ...prev,
+                  release: e.target.value,
+                }))
+              }
             />
           </section>
 
