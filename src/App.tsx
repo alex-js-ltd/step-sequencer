@@ -10,28 +10,39 @@ function App() {
     imag: wavetable.imag,
   });
 
+  type State = {
+    attackTime: string;
+    releaseTime: string;
+  };
+
+  const [state, setState] = useState<State>({
+    attackTime: '0.2',
+    releaseTime: '0.5',
+  });
+
+  console.log(state);
+
+  const sweepLength = 2;
   function playSweep(time: number) {
     const osc = new OscillatorNode(audioCtx, {
       frequency: 380,
       type: 'custom',
       periodicWave: wave,
     });
-    osc.connect(audioCtx.destination);
+
+    const attack = parseInt(state.attackTime, 10);
+    const release = parseInt(state.releaseTime, 10);
+
+    const sweepEnv = new GainNode(audioCtx);
+    sweepEnv.gain.cancelScheduledValues(time);
+    sweepEnv.gain.setValueAtTime(0, time);
+    sweepEnv.gain.linearRampToValueAtTime(1, time + attack);
+    sweepEnv.gain.linearRampToValueAtTime(0, time + sweepLength - release);
+
+    osc.connect(sweepEnv).connect(audioCtx.destination);
     osc.start(time);
-    osc.stop(time + 1);
+    osc.stop(time + sweepLength);
   }
-
-  type State = {
-    attack: string;
-    release: string;
-  };
-
-  const [state, setState] = useState<State>({
-    attack: '0.2',
-    release: '0.5',
-  });
-
-  console.log(state);
 
   return (
     <div id='sequencer'>
@@ -63,12 +74,12 @@ function App() {
               type='range'
               min='0'
               max='1'
-              value={state.attack}
+              value={state.attackTime}
               step='0.1'
               onChange={(e) =>
                 setState((prev) => ({
                   ...prev,
-                  attack: e.target.value,
+                  attackTime: e.target.value,
                 }))
               }
             />
@@ -79,12 +90,12 @@ function App() {
               type='range'
               min='0'
               max='1'
-              value={state.release}
+              value={`${state.releaseTime}`}
               step='0.1'
               onChange={(e) =>
                 setState((prev) => ({
                   ...prev,
-                  release: e.target.value,
+                  releaseTime: e.target.value,
                 }))
               }
             />
